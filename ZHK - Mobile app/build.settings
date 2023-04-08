@@ -22,9 +22,32 @@ settings =
 		allowAppsReadOnlyAccessToFiles = false,
 		usesPermissions =
         {
-            "android.permission.INTERNET",
-            "android.permission.CALL_PHONE",
+			"android.permission.INTERNET",
+            "android.permission.ACCESS_FINE_LOCATION",
+            "android.permission.ACCESS_COARSE_LOCATION",
         },
+		settings =
+{
+    android =
+    {
+        usesPermissions =
+        {
+            "android.permission.INTERNET",
+ 
+            --optional permission used to display current location via the GPS
+            "android.permission.ACCESS_FINE_LOCATION",
+ 
+            --optional permission used to display current location via WiFi or cellular service
+            "android.permission.ACCESS_COARSE_LOCATION",
+        },
+        usesFeatures =
+        {
+            { name = "android.hardware.location", required = false },
+            { name = "android.hardware.location.gps", required = false },
+            { name = "android.hardware.location.network", required = false }
+        },
+    },
+}
 	},
 
 	--

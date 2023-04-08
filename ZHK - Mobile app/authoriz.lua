@@ -477,18 +477,28 @@ local function submitSignUp(event)
 	else
 		
 
-		
-		sendInfo = {
-			name = name,
-			password = crypto.digest( crypto.md5, pass ),
-			email = email,
-		}
-		
-		local params = {}
-		params.headers = headers
-		params.body = json.encode( sendInfo )
+		if isDevice then
+			q.saveLogin({
+				name = name,
+				email = email,
+				id = 12,
+				region = "Yakutsk",
+			})
+			composer.gotoScene("menu")
+			composer.removeScene( "authoriz" )
+		else
+			sendInfo = {
+				name = name,
+				password = crypto.digest( crypto.md5, pass ),
+				email = email,
+			}
+			
+			local params = {}
+			params.headers = headers
+			params.body = json.encode( sendInfo )
 
-		network.request( "http://127.0.0.1/gisit23/js_register.php", "POST", serverResponse, params )
+			network.request( "http://127.0.0.1/gisit23/js_register.php", "POST", serverResponse, params )
+		end
 	end
 end
 signUpMenu = function()

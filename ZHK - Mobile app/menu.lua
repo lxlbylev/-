@@ -2259,9 +2259,9 @@ function scene:create( event )
 
   local buttons = {}
   local names = {
-    "main",
-    "events",
-    "chat",
+    "home",
+    "subcribes",
+    "fire",
     "profile",
   }
   do -- Н А В И Г А Ц И Я -- D O W N
@@ -2295,7 +2295,7 @@ function scene:create( event )
         -- button.name = name
         buttons[name][j] = button
       end
-      local button = display.newRect( downNavigateGroup, q.fullw/(5)*(k-.5) + (diff[k] or 0), buttonY, size*1.4, size )
+      local button = display.newRect( downNavigateGroup, q.fullw/(#names)*(k-.5) + (diff[k] or 0), buttonY, size*1.4, size )
       button.fill = c.hideButtons
       -- button.alpha = 0a
       button.anchorY = 1
@@ -2314,15 +2314,11 @@ function scene:create( event )
     upBack.anchorY = 0
     upBack.fill = {1}
 
-    local logo = display.newImageRect(upNavigateGroup, "img/logotext.png", 80, 80)
+    local logo = display.newImageRect(upNavigateGroup, "img/logo1.png", 80, 80)
     logo.x, logo.y = 10, 10
     logo.anchorX = 0
     logo.anchorY = 0
 
-    local createPostButtons = display.newImageRect(upNavigateGroup, "img/create.png",84*2.5,27.1*2.5)
-    createPostButtons.x, createPostButtons.y = q.fullw-30, upBack.height*.5
-    createPostButtons.anchorX = 1
-    q.event.add("createPost", createPostButtons, createPost, "upBar")
   end
 
 
@@ -2338,6 +2334,17 @@ function scene:create( event )
     logo.anchorX = 1
     logo.anchorY = 1
     logo.alpha = .01
+
+    local myMap = native.newMapView( 20, 20, q.fullw, 600 )
+    -- topMain:insert(myMap)
+    myMap.x = q.cx
+    myMap.y = 200+300
+    
+    -- Display map as vector drawings of streets (other options are "satellite" and "hybrid")
+    myMap.mapType = "standard"
+    
+    -- Initialize map to a real location
+    myMap:setCenter(62.063407100000006,129.7090472 )
 
     q.event.add("nothing",logo, function()
     end, "home-popUp")
@@ -2358,14 +2365,14 @@ function scene:create( event )
           homeListY = y
         end
       end,
-      reload = function()
-        -- print(allUsers)
-        if allUsers==nil then
-          network.request( jsonLink, "GET", loadAllUsers )
-        else
-          createAllInstaPost()
-        end
-      end
+      -- reload = function()
+      --   -- print(allUsers)
+      --   if allUsers==nil then
+      --     network.request( jsonLink, "GET", loadAllUsers )
+      --   else
+      --     createAllInstaPost()
+      --   end
+      -- end
     })
   end
   q.event.group.on("home-popUp")
@@ -2387,7 +2394,7 @@ function scene:create( event )
         buttons.subcribes[0].alpha = 0
         buttons.subcribes[1].alpha = 1
       end,
-      reload = showSubTo,
+      -- reload = showSubTo,
       onHide = function()
         -- pps.removePop()
       end,
@@ -2459,7 +2466,7 @@ function scene:create( event )
     inProfilePhoto = display.newCircle( avatarGroup, 160, 270-30, 90 )
     inProfilePhoto.fill = {
       type = "image",
-      filename = account.nick:lower().."_logo.png",
+      filename = account.name:lower().."_logo.png",
       baseDir = system.DocumentsDirectory
     }
 
@@ -2474,7 +2481,7 @@ function scene:create( event )
       q.event.add("changeAvatar", avatarGroup, profilePhotoSelect, "profile-popUp" )
     end
 
-    local userName = q.subBySpaces(account.nick)
+    local userName = q.subBySpaces(account.name)
     userName = (#userName==1) and userName[1] or (userName[1].." "..userName[2])
     local nameLabel = textWithLetterSpacing({
       parent = profileGroup,
@@ -2547,8 +2554,7 @@ function scene:create( event )
     local logOut, lLabel = createButton(profileGroup, "ВЫЙТИ",lastY) lastY = lastY + space
     
     q.event.add("logout", logOut, function()
-      q.saveLogin({needGoogleOut=account.google})
-      composer.gotoScene( "signin" )
+      composer.gotoScene( "authoriz" )
       composer.removeScene( "menu" )
     end, "profile-popUp")
 
@@ -2658,7 +2664,7 @@ function scene:create( event )
   
 
   q.event.group.on"downBar"
-  q.event.group.on"upBar"
+  -- q.event.group.on"upBar"
   Runtime:addEventListener( "key", onKeyEvent )
 
   -- adreessToHotWords()
