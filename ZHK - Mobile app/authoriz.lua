@@ -195,7 +195,10 @@ local function validemail(str)
   return true
 end
 
-
+local headers = {
+	["Content-Tpe"] = "application/json", 
+	["Accept-Language"] = "en-US",
+}
 -- ========[[[ ]]]======== --
 
 -- local countError = 5
@@ -283,16 +286,40 @@ end
 -- end
 local sendInfo
 
-local function serverResponse( event )
+local function authResponse( event )
 	if ( event.isError)  then
-	  print( "Error!" )
-		  showWarnin("Ошибка подключения: "..tostring(event.response))
+		print( "Error!" )
+		showWarnin("Ошибка подключения: "..tostring(event.response))
 	else
-	  local myNewData = event.response
-	  if myNewData:find("Register done") or myNewData:find("Login done") then
-		q.saveLogin(sendInfo)
+		local myNewData = event.response
+		q.saveLogin(json.decode(myNewData))
 		composer.gotoScene("menu")
 		composer.removeScene( "authoriz" )
+
+		
+
+	end
+
+end
+
+
+local function serverResponse( event )
+	if ( event.isError)  then
+		print( "Error!" )
+		showWarnin("Ошибка подключения: "..tostring(event.response))
+	else
+	  local myNewData = event.response
+	  if myNewData:find("Authorize Done") or myNewData:find("Login done") then
+		
+		local params = {}
+		params.headers = headers
+		params.body = json.encode( {email=sendInfo.email} )
+
+		network.request( "http://127.0.0.1/gisit23/js_get_user.php", "POST", authResponse, params )
+
+		-- q.saveLogin(sendInfo)
+		-- composer.gotoScene("menu")
+		-- composer.removeScene( "authoriz" )
 	  elseif myNewData:find("Already registered") then
 		showWarnin("Почта занята")
 	  elseif myNewData:find("Login failed") then
@@ -448,10 +475,7 @@ local function submitSignUp(event)
 	elseif pass:find("%s") then
 		showWarnin("Пароль не должен содержать пробелы")
 	else
-		local headers = {
-			["Content-Tpe"] = "application/json", 
-			["Accept-Language"] = "en-US",
-		}
+		
 
 		
 		sendInfo = {
@@ -683,9 +707,9 @@ function scene:create( event )
 
 	do -- Г Л А В Н Ы Й
 
-		-- local welcomeImage = display.newImageRect( welcomeGroup, "img/welcome.png", q.fullw, q.fullw*1.28 )
-		-- welcomeImage.x = q.cx
-		-- welcomeImage.y = q.fullh*.35
+		local welcomeImage = display.newImageRect( welcomeGroup, "img/welcome.png", q.fullw, q.fullw*1.45 )
+		welcomeImage.x = q.cx
+		welcomeImage.y = q.fullh*.35
 
 		local regButton = display.newRoundedRect(welcomeGroup, 60, q.fullh-50-130, q.fullw-60*2, 110, 30)
 		regButton.anchorX=0
